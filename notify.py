@@ -1,7 +1,7 @@
 """
 Calendar → LINE Notifier
-Sends a LINE push message when a meeting is ~15 minutes away.
-Designed to run every 15 minutes via GitHub Actions (no Mac required).
+Sends a LINE push message when a meeting is ~5 minutes away.
+Designed to run every 5 minutes via GitHub Actions (no Mac required).
 """
 
 import os
@@ -23,8 +23,8 @@ LINE_USER_ID = "U7494a4fbb73442776d95bad7c2b634ec"
 BANGKOK_TZ = pytz.timezone("Asia/Bangkok")
 
 # Notify if meeting starts within this window (minutes from now)
-WINDOW_MIN = 13
-WINDOW_MAX = 17
+WINDOW_MIN = 3
+WINDOW_MAX = 8
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ def main():
                 start_bkk = start.astimezone(BANGKOK_TZ)
                 time_str  = start_bkk.strftime("%H:%M")
 
-                msg = f"⏰ Meeting in 15 minutes!\n\n📅 {summary}\n🕐 {time_str}"
+                msg = f"⏰ Meeting in 5 minutes!\n\n📅 {summary}\n🕐 {time_str}"
                 if location:
                     msg += f"\n📍 {location}"
 
