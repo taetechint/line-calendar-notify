@@ -83,14 +83,47 @@ def main():
                 if not (window_lo <= start <= window_hi):
                     continue
 
-                summary  = str(event.get("SUMMARY",  "Untitled Event"))
-                location = str(event.get("LOCATION", "")).strip()
+                summary     = str(event.get("SUMMARY",     "Untitled Event")).strip()
+                location    = str(event.get("LOCATION",    "")).strip()
+                description = str(event.get("DESCRIPTION", "")).strip()
+                url         = str(event.get("URL",         "")).strip()
+
+                # End time & duration
+                dtend = event.get("DTEND")
+                end_str      = ""
+                duration_str = ""
+                if dtend:
+                    end_dt = to_aware_dt(dtend.dt)
+                    if end_dt:
+                        end_bkk      = end_dt.astimezone(BANGKOK_TZ)
+                        end_str      = end_bkk.strftime("%H:%M")
+                        total_mins   = int((end_dt - start).total_seconds() / 60)
+                        hours, mins  = divmod(total_mins, 60)
+                        if hours and mins:
+                            duration_str = f"{hours}h {mins}m"
+                        elif hours:
+                            duration_str = f"{hours}h"
+                        else:
+                            duration_str = f"{mins}m"
+
                 start_bkk = start.astimezone(BANGKOK_TZ)
                 time_str  = start_bkk.strftime("%H:%M")
 
-                msg = f"⏰ Meeting in 5 minutes!\n\n📅 {summary}\n🕐 {time_str}"
+                # Build time line
+                if end_str and duration_str:
+                    time_line = f"{time_str} – {end_str}  ({duration_str})"
+                else:
+                    time_line = time_str
+
+                msg = f"⏰ Meeting in 5 minutes!\n\n📅 {summary}\n🕐 {time_line}"
                 if location:
                     msg += f"\n📍 {location}"
+                if url:
+                    msg += f"\n🔗 {url}"
+                if description:
+                    # Trim to 300 chars to keep message readable
+                    desc_trimmed = description[:300] + ("…" if len(description) > 300 else "")
+                    msg += f"\n📝 {desc_trimmed}"
 
                 send_line(msg)
                 notified.append(summary)
